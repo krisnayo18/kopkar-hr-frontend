@@ -1,0 +1,12 @@
+# Exclude dependencies and build output
+node_modules/
+dist/
+build/
+
+# Exclude credentials and environment variables
+.env*
+*.pem
+private_key.json
+
+# Exclude files inside docs folder
+docs/

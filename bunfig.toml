@@ -1,0 +1,3 @@
+[install]
+# Replaces npm's legacy-peer-deps=true: allow installing packages with unmet peer dependencies
+peer = false
