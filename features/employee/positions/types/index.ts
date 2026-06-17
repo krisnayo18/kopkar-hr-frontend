@@ -10,7 +10,6 @@ export const positionSchema = z.object({
   name: z.string().min(1, 'Position name is required'),
   description: z.string().nullable().optional(),
   departmentId: z.string().min(1, 'Department ID is required'),
-  jobGradeId: z.string().nullable().optional(),
   minSalary: z
     .number()
     .positive('Minimum salary must be positive')

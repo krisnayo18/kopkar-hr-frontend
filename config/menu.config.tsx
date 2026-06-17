@@ -105,16 +105,6 @@ export const MENU_SIDEBAR: MenuConfig = [
         ],
       },
       {
-        title: 'Job Grades',
-        children: [
-          {
-            title: 'Job Grades List',
-            path: '/job-grades',
-            disabled: true,
-          },
-        ],
-      },
-      {
         title: 'Health Insurance',
         children: [
           {
@@ -229,7 +219,6 @@ export const MENU_SIDEBAR_COMPACT: MenuConfig = [
       { title: 'Contract List', path: '/contracts' },
       { title: 'Department List', path: '/departments' },
       { title: 'Position List', path: '/positions' },
-      { title: 'Job Grade List', path: '/job-grades' },
       { title: 'Health Insurance', path: '/insurances' },
       { title: 'Employment Assurance', path: '/assurances' },
     ],
@@ -237,9 +226,7 @@ export const MENU_SIDEBAR_COMPACT: MenuConfig = [
   {
     title: 'Recruitment',
     icon: PeopleIcon,
-    children: [
-      { title: 'Recruitment List', path: '/recruitments' },
-    ],
+    children: [{ title: 'Recruitment List', path: '/recruitments' }],
   },
   {
     title: 'Health & Safety',

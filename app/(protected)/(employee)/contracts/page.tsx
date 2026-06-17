@@ -1,5 +1,12 @@
-const ContractsPage = () => {
-  return <div>ContractPages</div>;
-};
+import { Container } from '@/components/common/container';
+import ContractsContent from './content';
 
-export default ContractsPage;
+export default function ContractsPage() {
+  return (
+    <>
+      <Container>
+        <ContractsContent />
+      </Container>
+    </>
+  );
+}

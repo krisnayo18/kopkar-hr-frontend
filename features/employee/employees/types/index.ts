@@ -102,7 +102,6 @@ export const employeeSchema = z.object({
 
   departmentId: z.string().min(1, 'Department is required'),
   positionId: z.string().min(1, 'Position is required'),
-  jobGradeId: z.string().nullable().optional(),
   managerId: z.string().nullable().optional(),
   branchId: z.string().nullable().optional(),
   status: employmentStatusSchema,

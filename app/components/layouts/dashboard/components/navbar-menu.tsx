@@ -40,7 +40,6 @@ export function NavbarMenu() {
     '/contracts',
     '/departments',
     '/positions',
-    '/job-grades',
     '/insurances',
     '/assurances',
   ];
@@ -55,7 +54,7 @@ export function NavbarMenu() {
   ) {
     navbarMenu = MENU_SIDEBAR?.[3];
   } else {
-    navbarMenu = MENU_SIDEBAR?.[0];
+    navbarMenu = MENU_SIDEBAR?.[1];
   }
   // else if (pathname.includes('/public-profile/')) {
   //   navbarMenu = MENU_SIDEBAR?.[2];

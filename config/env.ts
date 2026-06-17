@@ -8,10 +8,7 @@ const envSchema = z.object({
     .default('false'),
 
   // HR — Go backend :8080
-  NEXT_PUBLIC_HR_API_URL: z
-    .string()
-    .url()
-    .default('http://localhost:8080/api'),
+  NEXT_PUBLIC_HR_API_URL: z.string().url().default('http://localhost:8080/api'),
 
   // ATTENDANCE — Go backend :3001
   NEXT_PUBLIC_ATTENDANCE_API_URL: z
@@ -39,7 +36,9 @@ export const env = envSchema.parse({
   NEXT_PUBLIC_ENABLE_MOCK: process.env.NEXT_PUBLIC_ENABLE_MOCK,
   NEXT_PUBLIC_HR_API_URL: process.env.NEXT_PUBLIC_HR_API_URL,
   NEXT_PUBLIC_ATTENDANCE_API_URL: process.env.NEXT_PUBLIC_ATTENDANCE_API_URL,
-  NEXT_PUBLIC_COMPENSATION_API_URL: process.env.NEXT_PUBLIC_COMPENSATION_API_URL,
-  NEXT_PUBLIC_NOTIFICATION_API_URL: process.env.NEXT_PUBLIC_NOTIFICATION_API_URL,
+  NEXT_PUBLIC_COMPENSATION_API_URL:
+    process.env.NEXT_PUBLIC_COMPENSATION_API_URL,
+  NEXT_PUBLIC_NOTIFICATION_API_URL:
+    process.env.NEXT_PUBLIC_NOTIFICATION_API_URL,
 });
 // NEXT_PUBLIC_HCM_WS_URL: process.env.NEXT_PUBLIC_HCM_WS_URL,

@@ -7,6 +7,10 @@ export const hrEndpoints = {
     list: '/employees',
     detail: (id: string) => `/employees/${id}`,
   },
+  positions: {
+    list: '/positions',
+    detail: (id: string) => `/positions/${id}`,
+  },
   contracts: {
     list: '/contracts',
     detail: (id: string) => `/contracts/${id}`,

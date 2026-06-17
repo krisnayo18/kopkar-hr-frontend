@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
-import { db } from '../db';
 import { env } from '@/config/env';
+import { db } from '../db';
 import { networkDelay } from '../utils';
 
 export const employeesHandlers = [
@@ -11,12 +11,16 @@ export const employeesHandlers = [
   }),
 
   // GET /employees/:id
-  http.get(`${env.NEXT_PUBLIC_HR_API_URL}/employees/:id`, async ({ params }) => {
-    await networkDelay();
-    const emp = db.employees.find((e) => e.id === params.id);
-    if (!emp) return HttpResponse.json({ message: 'Not found' }, { status: 404 });
-    return HttpResponse.json(emp);
-  }),
+  http.get(
+    `${env.NEXT_PUBLIC_HR_API_URL}/employees/:id`,
+    async ({ params }) => {
+      await networkDelay();
+      const emp = db.employees.find((e) => e.id === params.id);
+      if (!emp)
+        return HttpResponse.json({ message: 'Not found' }, { status: 404 });
+      return HttpResponse.json(emp);
+    },
+  ),
 
   // POST /employees
   http.post(`${env.NEXT_PUBLIC_HR_API_URL}/employees`, async ({ request }) => {
@@ -68,12 +72,15 @@ export const employeesHandlers = [
   ),
 
   // DELETE /employees/:id
-  http.delete(`${env.NEXT_PUBLIC_HR_API_URL}/employees/:id`, async ({ params }) => {
-    await networkDelay();
-    const idx = db.employees.findIndex((e) => e.id === params.id);
-    if (idx === -1)
-      return HttpResponse.json({ message: 'Not found' }, { status: 404 });
-    db.employees.splice(idx, 1);
-    return new HttpResponse(null, { status: 204 });
-  }),
+  http.delete(
+    `${env.NEXT_PUBLIC_HR_API_URL}/employees/:id`,
+    async ({ params }) => {
+      await networkDelay();
+      const idx = db.employees.findIndex((e) => e.id === params.id);
+      if (idx === -1)
+        return HttpResponse.json({ message: 'Not found' }, { status: 404 });
+      db.employees.splice(idx, 1);
+      return new HttpResponse(null, { status: 204 });
+    },
+  ),
 ];

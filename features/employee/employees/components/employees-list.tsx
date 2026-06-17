@@ -2,6 +2,13 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useDepartments } from '@/features/employee/departments/api/get-departments';
+import { useEmployees } from '@/features/employee/employees/api/get-employees';
+import type {
+  Employee,
+  EmploymentStatus,
+} from '@/features/employee/employees/types';
+import { usePositions } from '@/features/employee/positions/api/get-positions';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -58,15 +65,8 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
-import { MOCK_DEPARTMENTS } from '@/app/models/department';
-import {
-  Employee,
-  EmploymentStatus,
-  MOCK_EMPLOYEES,
-} from '@/app/models/employee';
-import { MOCK_POSITIONS } from '@/app/models/position';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//  ─── Types ────────────────────────────────────────────────────────────────────
 type BadgeVariant =
   | 'primary'
   | 'secondary'
@@ -75,7 +75,7 @@ type BadgeVariant =
   | 'info'
   | 'destructive';
 
-// ─── Status badge config ──────────────────────────────────────────────────────
+//  ─── Status badge config ──────────────────────────────────────────────────────
 const STATUS_BADGE: Record<
   EmploymentStatus,
   { variant: BadgeVariant; label: string }
@@ -89,13 +89,7 @@ const STATUS_BADGE: Record<
   Retired: { variant: 'secondary', label: 'Retired' },
 };
 
-// ─── Lookup maps (resolved from mock/API data) ────────────────────────────────
-const DEPT_MAP = Object.fromEntries(
-  MOCK_DEPARTMENTS.map((d) => [d.id, d.name]),
-);
-const POS_MAP = Object.fromEntries(MOCK_POSITIONS.map((p) => [p.id, p.name]));
-
-// ─── Actions dropdown cell ────────────────────────────────────────────────────
+//  ─── Actions dropdown cell ────────────────────────────────────────────────────
 function ActionsCell({ row }: { row: Row<Employee> }) {
   return (
     <DropdownMenu>
@@ -116,8 +110,11 @@ function ActionsCell({ row }: { row: Row<Employee> }) {
   );
 }
 
-// ─── Column definitions ───────────────────────────────────────────────────────
-function getEmployeeColumns(): ColumnDef<Employee>[] {
+//  ─── Column definitions ───────────────────────────────────────────────────────
+function getEmployeeColumns(
+  deptMap: Record<string, string>,
+  posMap: Record<string, string>,
+): ColumnDef<Employee>[] {
   return [
     // ── Select ──────────────────────────────────────────────────────────
     {
@@ -180,7 +177,7 @@ function getEmployeeColumns(): ColumnDef<Employee>[] {
     // ── Department ───────────────────────────────────────────────────────
     {
       id: 'department',
-      accessorFn: (row) => DEPT_MAP[row.departmentId] ?? row.departmentId,
+      accessorFn: (row) => deptMap[row.departmentId] ?? row.departmentId,
       header: ({ column }) => (
         <DataGridColumnHeader title="Department" column={column} />
       ),
@@ -196,7 +193,7 @@ function getEmployeeColumns(): ColumnDef<Employee>[] {
     // ── Position ─────────────────────────────────────────────────────────
     {
       id: 'position',
-      accessorFn: (row) => POS_MAP[row.positionId] ?? row.positionId,
+      accessorFn: (row) => posMap[row.positionId] ?? row.positionId,
       header: ({ column }) => (
         <DataGridColumnHeader title="Position" column={column} />
       ),
@@ -264,15 +261,19 @@ function getEmployeeColumns(): ColumnDef<Employee>[] {
   ];
 }
 
-// ─── Filter hook ──────────────────────────────────────────────────────────────
-// Encapsulates all search / filter state so EmployeesList stays lean.
-function useEmployeeFilters() {
+//  ─── Filter hook ──────────────────────────────────────────────────────────────
+//  Encapsulates all search / filter state so EmployeesList stays lean.
+function useEmployeeFilters(
+  employees: Employee[],
+  deptMap: Record<string, string>,
+  posMap: Record<string, string>,
+) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [activeOnly, setActiveOnly] = useState(false);
 
   const filteredData = useMemo(() => {
-    return MOCK_EMPLOYEES.filter((item) => {
+    return employees.filter((item) => {
       if (activeOnly && item.status !== 'Active') return false;
       if (
         selectedStatuses.length > 0 &&
@@ -285,25 +286,25 @@ function useEmployeeFilters() {
           item.fullName.toLowerCase().includes(q) ||
           item.employeeNumber.toLowerCase().includes(q) ||
           item.email.toLowerCase().includes(q) ||
-          (DEPT_MAP[item.departmentId] ?? '').toLowerCase().includes(q) ||
-          (POS_MAP[item.positionId] ?? '').toLowerCase().includes(q)
+          (deptMap[item.departmentId] ?? '').toLowerCase().includes(q) ||
+          (posMap[item.positionId] ?? '').toLowerCase().includes(q)
         );
       }
       return true;
     });
-  }, [searchQuery, selectedStatuses, activeOnly]);
+  }, [employees, deptMap, posMap, searchQuery, selectedStatuses, activeOnly]);
 
   // Static counts — always based on full dataset so filter counts don't shift
   const statusCounts = useMemo(
     () =>
-      MOCK_EMPLOYEES.reduce(
+      employees.reduce(
         (acc, item) => {
           acc[item.status] = (acc[item.status] || 0) + 1;
           return acc;
         },
         {} as Record<string, number>,
       ),
-    [],
+    [employees],
   );
 
   const handleStatusChange = (checked: boolean, value: string) =>
@@ -323,8 +324,8 @@ function useEmployeeFilters() {
   };
 }
 
-// ─── Card toolbar (right side of CardHeader) ─────────────────────────────────
-// Must render inside <DataGrid> context (needs useDataGrid for column visibility).
+//  ─── Card toolbar (right side of CardHeader) ─────────────────────────────────
+//  Must render inside <DataGrid> context (needs useDataGrid for column visibility).
 interface CardToolbarProps {
   activeOnly: boolean;
   onActiveOnlyChange: (value: boolean) => void;
@@ -365,8 +366,8 @@ function EmployeesCardToolbar({
   );
 }
 
-// ─── Go to page input ─────────────────────────────────────────────────────────
-// Must render inside <DataGrid> context.
+//  ─── Go to page input ─────────────────────────────────────────────────────────
+//  Must render inside <DataGrid> context.
 function GoToPage() {
   const { table } = useDataGrid();
   const [value, setValue] = useState('');
@@ -396,9 +397,24 @@ function GoToPage() {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+//  ─── Main component ───────────────────────────────────────────────────────────
 const EmployeesList = () => {
-  const filters = useEmployeeFilters();
+  const { data: employees = [], isLoading: isLoadingEmployees } =
+    useEmployees();
+  const { data: departments = [] } = useDepartments();
+  const { data: positions = [] } = usePositions();
+
+  const deptMap = useMemo(
+    () => Object.fromEntries(departments.map((d) => [d.id, d.name])),
+    [departments],
+  );
+
+  const posMap = useMemo(
+    () => Object.fromEntries(positions.map((p) => [p.id, p.name])),
+    [positions],
+  );
+
+  const filters = useEmployeeFilters(employees, deptMap, posMap);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -410,7 +426,10 @@ const EmployeesList = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   // Column definitions are stable — no inline closures depend on component state
-  const columns = useMemo(() => getEmployeeColumns(), []);
+  const columns = useMemo(
+    () => getEmployeeColumns(deptMap, posMap),
+    [deptMap, posMap],
+  );
 
   const table = useReactTable({
     columns,

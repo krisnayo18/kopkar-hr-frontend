@@ -1,16 +1,19 @@
-import { Faq } from '@/app/components/partials/common/faq';
-import { Help2 } from '@/app/components/partials/common/help2';
-import { InvitePeople } from '../../account/invite-a-friend/components';
-import { EmployeesList } from './components';
+import { Suspense } from 'react';
+import { EmployeesList } from '@/features/employee/employees/components/employees-list';
 
 export default function EmployeesContent() {
   return (
     //give gap each component
     <div className="grid gap-5 lg:gap-7.5">
-      <EmployeesList />
-      <Faq />
-      <Help2 />
-      <InvitePeople />
+      <Suspense
+        fallback={
+          <div className="py-8 text-center text-gray-500">
+            Loading employees...
+          </div>
+        }
+      >
+        <EmployeesList />
+      </Suspense>
     </div>
   );
 }
